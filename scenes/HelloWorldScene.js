@@ -3,7 +3,8 @@ export default class HelloWorldScene extends Phaser.Scene {
         super("hello-world");
         this.ground = null; // Declare ground
         this.tung = null; // Declare tung
-        this.obstacle = null; // Declare obstacle
+        this.obstaclesGroup = null; // Group for obstacles
+        this.aereosGroup = null; // Group for aereos
         this.collectible = null; // Declare collectible
         this.cursors = null; // Declare cursors
         this.gameSpeed = 200; // Initialize gameSpeed
@@ -20,6 +21,7 @@ export default class HelloWorldScene extends Phaser.Scene {
         this.load.image('ground', 'images/ground.png');
         this.load.image('obstacle', 'images/obstacle.png'); // Load obstacle image
         this.load.image('collectible', 'images/collectible.png'); // Load collectible image
+        this.load.image('aereo', 'images/aereo.png'); // Ensure aereo image is loaded
     }
 
     create() {
@@ -31,23 +33,51 @@ export default class HelloWorldScene extends Phaser.Scene {
         this.tung.setGravityY(200);
         this.tung.setScale(0.7); // Scale the character
 
-        this.obstacle = this.physics.add.sprite(800, 250, 'obstacle'); // Ensure obstacle is visible
-        this.obstacle.setVelocityX(-this.gameSpeed);
-        this.obstacle.setImmovable(true);
-        this.obstacle.body.allowGravity = false;
+        this.obstaclesGroup = this.physics.add.group(); // Group for obstacles
+        this.aereosGroup = this.physics.add.group(); // Group for aereos
 
         this.collectible = this.physics.add.sprite(400, 200, 'collectible'); // Add collectible
         this.collectible.setScale(0.5); // Scale the collectible
         this.collectible.body.allowGravity = false; // Prevent gravity on collectible
 
         this.physics.add.collider(this.tung, this.ground); // Collision between tung and ground
-        this.physics.add.collider(this.obstacle, this.ground); // Collision between obstacle and ground
-        this.physics.add.collider(this.collectible, this.ground); // Ensure collectible rests on the ground
-        this.tungObstacleCollider = this.physics.add.collider(this.tung, this.obstacle, this.hitObstacle, null, this); // Collision with obstacle
+        this.physics.add.collider(this.obstaclesGroup, this.ground); // Collision between obstacles and ground
+        this.physics.add.collider(this.aereosGroup, this.ground); // Collision between aereos and ground
+        this.physics.add.collider(this.tung, this.obstaclesGroup, this.hitObstacle, null, this); // Collision with obstacles
+        this.physics.add.collider(this.tung, this.aereosGroup, this.hitObstacle, null, this); // Collision with aereos
         this.physics.add.overlap(this.tung, this.collectible, this.collectItem, null, this); // Add overlap logic
 
         this.cursors = this.input.keyboard.createCursorKeys();
         this.input.keyboard.on('keydown-SPACE', this.jump, this);
+
+        // Spawn obstacles and aereos periodically
+        this.time.addEvent({
+            delay: 2000, // Spawn obstacle every 2 seconds
+            callback: this.spawnObstacle,
+            callbackScope: this,
+            loop: true
+        });
+
+        this.time.addEvent({
+            delay: 3000, // Spawn aereo every 3 seconds
+            callback: this.spawnAereo,
+            callbackScope: this,
+            loop: true
+        });
+    }
+
+    spawnObstacle() {
+        const obstacle = this.obstaclesGroup.create(800, 250, 'obstacle'); // Spawn obstacle
+        obstacle.setVelocityX(-this.gameSpeed);
+        obstacle.setImmovable(true);
+        obstacle.body.allowGravity = false;
+    }
+
+    spawnAereo() {
+        const aereo = this.aereosGroup.create(800, Phaser.Math.Between(50, 150), 'aereo'); // Spawn aereo at random height
+        aereo.setVelocityX(-this.gameSpeed);
+        aereo.setImmovable(true);
+        aereo.body.allowGravity = false;
     }
 
     collectItem(tung, collectible) {
@@ -60,6 +90,7 @@ export default class HelloWorldScene extends Phaser.Scene {
 
         // Temporarily disable collision between tung and obstacle
         this.physics.world.removeCollider(this.tungObstacleCollider);
+        this.physics.world.removeCollider(this.tungAereoCollider); // Disable aereo collision
 
         this.time.delayedCall(3000, () => { // Remove immunity after 3 seconds
             this.tung.clearTint(); // Reset tung's color
@@ -67,6 +98,7 @@ export default class HelloWorldScene extends Phaser.Scene {
 
             // Re-enable collision between tung and obstacle
             this.tungObstacleCollider = this.physics.add.collider(this.tung, this.obstacle, this.hitObstacle, null, this);
+            this.tungAereoCollider = this.physics.add.collider(this.tung, this.aereo, this.hitObstacle, null, this); // Re-enable aereo collision
         });
     }
 
@@ -92,15 +124,22 @@ export default class HelloWorldScene extends Phaser.Scene {
     update() {
         this.ground.tilePositionX += this.gameSpeed * 0.02; // Move ground to the right
 
-        if (this.obstacle.x < -this.obstacle.width) {
-            this.obstacle.x = 800 + Phaser.Math.Between(0, 300);
-        }
+        this.obstaclesGroup.getChildren().forEach(obstacle => {
+            if (obstacle.x < -obstacle.width) {
+                obstacle.destroy(); // Remove obstacle if it goes off-screen
+            }
+        });
+
+        this.aereosGroup.getChildren().forEach(aereo => {
+            if (aereo.x < -aereo.width) {
+                aereo.destroy(); // Remove aereo if it goes off-screen
+            }
+        });
 
         if (this.collectible.x < -this.collectible.width) {
             this.collectible.x = 800 + Phaser.Math.Between(0, 300); // Reset collectible position
         }
 
         this.collectible.x -= this.gameSpeed * 0.02; // Move collectible to the left
-        this.obstacle.x -= this.gameSpeed * 0.02; // Move obstacle to the left
     }
 }
