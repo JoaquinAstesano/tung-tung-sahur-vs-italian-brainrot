@@ -7,6 +7,8 @@ export default class HelloWorldScene extends Phaser.Scene {
         this.collectible = null; // Declare collectible
         this.cursors = null; // Declare cursors
         this.gameSpeed = 200; // Initialize gameSpeed
+        this.aereosGroup = null; // Group for aereos
+
     }
 
     init() {
@@ -17,19 +19,24 @@ export default class HelloWorldScene extends Phaser.Scene {
     }
     preload() {
         this.load.image('tung', 'images/tu-imagen-dino.png'); // Ensure the file path is correct
-        this.load.image('ground', 'images/ground.png');
+        this.load.image('ground', 'Public/assets/platforms.png'); // Load obstacle image
         this.load.image('obstacle', 'images/obstacle.png'); // Load obstacle image
         this.load.image('collectible', 'images/collectible.png'); // Load collectible image
     }
 
     create() {
-        this.ground = this.add.tileSprite(400, 300, 800, 70, 'ground'); // Ensure ground is visible
-        this.physics.add.existing(this.ground, true);
+        //this.ground = this.add.image(400, 300, 800, 70, 'ground').setScale(4); // Add background image
+        this.ground = this.add.tileSprite(400, 300, 800, 70, 'ground'); // Use tileSprite for ground
+        this.physics.add.existing(this.ground);
+        this.physics.add.collider(this.ground, this.tung); // Ensure tung collides with ground
+        this.ground.body.immovable = true; // Make ground immovabl
+        this.ground.body.allowGravity = false; // Prevent gravity on ground
+
 
         this.tung = this.physics.add.sprite(100, 250, 'tung'); // Ensure tung is visible
         this.tung.setCollideWorldBounds(true);
         this.tung.setGravityY(200);
-        this.tung.setScale(0.7); // Scale the character
+        this.tung.setScale(1); // Scale the character
 
         this.obstacle = this.physics.add.sprite(800, 250, 'obstacle'); // Ensure obstacle is visible
         this.obstacle.setVelocityX(-this.gameSpeed);
@@ -61,7 +68,7 @@ export default class HelloWorldScene extends Phaser.Scene {
         // Temporarily disable collision between tung and obstacle
         this.physics.world.removeCollider(this.tungObstacleCollider);
 
-        this.time.delayedCall(3000, () => { // Remove immunity after 3 seconds
+        this.time.delayedCall(30000, () => { // Remove immunity after 3 seconds
             this.tung.clearTint(); // Reset tung's color
             this.tung.isImmune = false; // Remove immunity flag
 
