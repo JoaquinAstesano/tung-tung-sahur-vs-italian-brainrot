@@ -8,6 +8,8 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.cursors = null;
     this.gameSpeed = 200;
     this.aereosGroup = null;
+    this.bombs = null; // Nuevo grupo de bombas
+    this.bombTimer = null;
   }
 
   init() {}
@@ -16,6 +18,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.load.image("ground", "Public/assets/platforms.png");
     // this.load.image('obstacle', 'Public/assets/slime_green.png');
     this.load.image("collectible", "images/collectible.png");
+    this.load.image("bomb", "Public/assets/bomb.png"); 
   }
 
   create() {
@@ -56,6 +59,14 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.collectible.setScale(0.5);
     this.collectible.body.allowGravity = false;
 
+    this.bombs = this.physics.add.group();
+    this.bombTimer = this.time.addEvent({
+      delay: 5000,
+      callback: this.spawnBomb,
+      callbackScope: this,
+      loop: true,
+    });
+
     this.physics.add.collider(this.tung, this.ground);
     this.physics.add.collider(this.obstacle, this.ground);
     this.physics.add.collider(this.collectible, this.ground);
@@ -74,8 +85,37 @@ export default class HelloWorldScene extends Phaser.Scene {
       this
     );
 
+    // Colisión entre tung y bombas: perder al colisionar
+    this.physics.add.overlap(
+      this.tung,
+      this.bombs,
+      this.hitObstacle,
+      null,
+      this
+    );
+
     this.cursors = this.input.keyboard.createCursorKeys();
     this.input.keyboard.on("keydown-SPACE", this.jump, this);
+
+    this.keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+    this.keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+  }
+
+  spawnBomb() {
+    const x = Phaser.Math.Between(0, 300);
+    const bomb = this.bombs.create(x, 0, "bomb");
+    bomb.setVelocityY(Phaser.Math.Between(200, 350));
+    bomb.setGravityY(0);
+    bomb.setCollideWorldBounds(false);
+    bomb.setScale(0.5);
+    bomb.body.allowGravity = false;
+    bomb.outOfBoundsKill = true;
+    bomb.checkWorldBounds = true;
+    bomb.update = function () {
+      if (this.y > 600) {
+        this.destroy();
+      }
+    };
   }
 
   collectItem(tung, collectible) {
@@ -97,6 +137,12 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   hitObstacle(tung, obstacle) {
+    // Si tung es inmune y el obstáculo es una bomba, solo destruye la bomba
+    if (this.tung.isImmune && obstacle.texture && obstacle.texture.key === "bomb") {
+      obstacle.disableBody(true, true);
+      return;
+    }
+
     obstacle.disableBody(true, false);
 
     if (this.tung.isImmune) {
@@ -113,11 +159,11 @@ export default class HelloWorldScene extends Phaser.Scene {
   update() {
     this.ground.tilePositionX += this.gameSpeed * 0.02;
 
-    // Movimiento de tung con flechas izquierda y derecha
-    if (this.cursors.left.isDown) {
+    // Movimiento de tung con "A" (izquierda) y "D" (derecha)
+    if (this.keyA.isDown) {
       this.tung.setVelocityX(-200);
       this.tung.setFlipX(true);
-    } else if (this.cursors.right.isDown) {
+    } else if (this.keyD.isDown) {
       this.tung.setVelocityX(200);
       this.tung.setFlipX(false);
     } else {
@@ -169,6 +215,11 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.collectible.x -= this.gameSpeed * 0.02;
     this.obstacle.x -= this.gameSpeed * 0.02;
     this.aereoObstacle.x -= this.gameSpeed * 0.02;
+
+    
+    this.bombs.children.iterate(function (bomb) {
+      if (bomb && bomb.update) bomb.update();
+    });
 
     if (this.tung.x < 0) {
       this.tung.x = 0;
