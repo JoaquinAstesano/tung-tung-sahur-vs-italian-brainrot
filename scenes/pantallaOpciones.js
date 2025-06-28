@@ -5,11 +5,11 @@ export default class PantallaOpciones extends Phaser.Scene {
 
   create() {
     this.add.rectangle(400, 300, 800, 600, 0x223355).setDepth(-1);
-    this.add.text(400, 120, 'OPCIONES', { fontSize: '48px', color: '#fff', fontFamily: 'Arial', fontStyle: 'bold' }).setOrigin(0.5);
-    this.add.text(400, 170, 'Ajustes de Volumen', { fontSize: '32px', color: '#fff', fontFamily: 'Arial' }).setOrigin(0.5);
+    this.add.text(400, 120, 'OPCIONES', { fontSize: '48px', color: '#fff', fontFamily: 'Pixellaria', fontStyle: 'bold' }).setOrigin(0.5);
+    this.add.text(400, 170, 'Ajustes de Volumen', { fontSize: '32px', color: '#fff', fontFamily: 'Pixellaria' }).setOrigin(0.5);
 
     // Volumen Música
-    this.add.text(250, 220, 'Música', { fontSize: '24px', color: '#fff', fontFamily: 'Arial' }).setOrigin(0.5, 0.5);
+    this.add.text(250, 220, 'Música', { fontSize: '24px', color: '#fff', fontFamily: 'Pixellaria' }).setOrigin(0.5, 0.5);
     this.musicBar = this.add.rectangle(400, 220, 200, 16, 0x8888ff).setOrigin(0.5);
     this.musicFill = this.add.rectangle(300, 220, 100, 16, 0x00ff00).setOrigin(0, 0.5);
     this.musicBar.setInteractive({ useHandCursor: true });
@@ -21,7 +21,7 @@ export default class PantallaOpciones extends Phaser.Scene {
     });
 
     // Volumen SFX
-    this.add.text(250, 270, 'SFX', { fontSize: '24px', color: '#fff', fontFamily: 'Arial' }).setOrigin(0.5, 0.5);
+    this.add.text(250, 270, 'SFX', { fontSize: '24px', color: '#fff', fontFamily: 'Pixellaria' }).setOrigin(0.5, 0.5);
     this.sfxBar = this.add.rectangle(400, 270, 200, 16, 0x8888ff).setOrigin(0.5);
     this.sfxFill = this.add.rectangle(300, 270, 100, 16, 0xff8800).setOrigin(0, 0.5);
     this.sfxBar.setInteractive({ useHandCursor: true });
@@ -32,7 +32,7 @@ export default class PantallaOpciones extends Phaser.Scene {
       this.registry.set('sfxVolume', percent);
     });
 
-    const volver = this.add.text(70, 30, 'VOLVER', { fontSize: '20px', color: '#ff0', fontFamily: 'Arial' }).setOrigin(0.5);
+    const volver = this.add.text(70, 30, 'VOLVER', { fontSize: '20px', color: '#ff0', fontFamily: 'Pixellaria' }).setOrigin(0.5);
     volver.setInteractive({ useHandCursor: true });
     volver.on('pointerdown', () => {
       this.scene.start('PantallaMenu');

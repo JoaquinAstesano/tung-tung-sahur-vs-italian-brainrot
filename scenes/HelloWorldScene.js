@@ -16,39 +16,51 @@ export default class HelloWorldScene extends Phaser.Scene {
   preload() {
     this.load.image("tung", "Public/assets/9eiAAB.png");
     this.load.image("Ground", "Public/assets/Ground.png");
-    this.load.image("Ground2", "Public/assets/Ground2.png");
+    this.load.image("Ground1", "Public/assets/Ground1.png"); // <-- Añadido
+    this.load.image("Ground2", "Public/assets/Ground2.png"); 
     this.load.image("bomb", "Public/assets/bomb.png");
-    // this.load.image("coin", "Public/assets/coin.png");
+    this.load.image("obstacle", "Public/assets/obstacle.png"); 
     // Fondos parallax
-    this.load.image("bg", "Public/assets/parallax-mountain-bg.png");
-    this.load.image("fgTrees", "Public/assets/parallax-mountain-foreGround-trees.png");
-    this.load.image("far", "Public/assets/parallax-mountain-montain-far.png");
-    this.load.image("mountains", "Public/assets/parallax-mountain-mountains.png");
-    this.load.image("trees", "Public/assets/parallax-mountain-trees.png");
+    this.load.image("cielo", "Public/assets/cielo.png");
+    this.load.image("nubes" , "Public/assets/nubes.png");
+    this.load.image("arboles1", "Public/assets/arboles1.png");
+    this.load.image("arboles2", "Public/assets/arboles2.png");
   }
 
   create() {
     // Fondos parallax
-    this.bg = this.add.tileSprite(0, 300, 1600, 600, "bg").setScrollFactor(0);
-    this.far = this.add.tileSprite(0, 300, 1600, 600, "far").setScrollFactor(0);
-    this.mountains = this.add.tileSprite(0, 300, 1600, 600, "mountains").setScrollFactor(0);
-    this.trees = this.add.tileSprite(0, 300, 1600, 600, "trees").setScrollFactor(0);
-    this.fgTrees = this.add.tileSprite(0, 300, 1600, 600, "fgTrees").setScrollFactor(0);
-
-    this.Ground2 = this.add.tileSprite(0, 260, 1600, 24, "Ground2");
+    this.cielo = this.add.tileSprite(0, 300, 1600, 600, "cielo").setScrollFactor(0);
+    this.nubes = this.add.tileSprite(0, 300, 1600, 600, "nubes").setScrollFactor(0);
+    this.arboles1 = this.add.tileSprite(0, 300, 1600, 600, "arboles1").setScrollFactor(0);
+    this.arboles2 = this.add.tileSprite(0, 300, 1600, 600, "arboles2").setScrollFactor(0);
     
+    // Ajusta todos los ground para que estén juntos en la parte inferior del canvas 800x300
+    // Ground1: 22px alto, Ground: 18px alto, Ground2: 24px alto (según tu preload)
+    // Orden correcto: Ground1 (abajo), Ground (medio), Ground2 (arriba)
+    // Ground1 (abajo del todo)
+    this.Ground1 = this.add.tileSprite(400, 289, 800, 22, "Ground1"); // 300 - 22/2 = 289
 
-    this.Ground = this.add.tileSprite(400, 300, 800, 70, "Ground");
+    // Ground (en el medio)
+    this.Ground = this.add.tileSprite(400, 278, 800, 18, "Ground");   // 289 - 22/2 + 18/2 = 278
+
+    // Ground2 (arriba)
+    this.Ground2 = this.add.tileSprite(400, 266, 800, 24, "Ground2"); // 278 - 18/2 + 24/2 = 266
+
     this.physics.add.existing(this.Ground);
-    this.physics.add.collider(this.Ground, this.tung);
     this.Ground.body.immovable = true;
     this.Ground.body.allowGravity = false;
 
-    this.tung = this.physics.add.sprite(100, 150, "tung");
+    // Si quieres usar Ground2, agrégalo en otra posición más adelante
+    // Por ejemplo:
+    // this.Ground2 = this.add.tileSprite(400, 244, 800, 24, "Ground2");
+
+    this.tung = this.physics.add.sprite(100, 150, "tung"); // Ajusta Y para que esté sobre el suelo
     this.tung.setCollideWorldBounds(true);
     this.tung.setGravityY(200);
     this.tung.setScale(0.3, 0.4);
     this.tung.setFlipX(true);
+
+    this.physics.add.collider(this.tung, this.Ground);
 
     this.obstacle = this.physics.add.sprite(800, 250, "obstacle");
     this.obstacle.setVelocityX(-this.gameSpeed);
@@ -82,7 +94,6 @@ export default class HelloWorldScene extends Phaser.Scene {
       loop: true,
     });
 
-    this.physics.add.collider(this.tung, this.Ground);
     this.physics.add.collider(this.obstacle, this.Ground);
     this.physics.add.collider(this.collectible, this.Ground);
     this.tungObstacleCollider = this.physics.add.overlap(
@@ -187,14 +198,14 @@ export default class HelloWorldScene extends Phaser.Scene {
 
   update() {
     // Parallax
-    this.bg.tilePositionX += this.gameSpeed * 0.005;
-    this.far.tilePositionX += this.gameSpeed * 0.01;
-    this.mountains.tilePositionX += this.gameSpeed * 0.015;
-    this.trees.tilePositionX += this.gameSpeed * 0.02;
-    this.fgTrees.tilePositionX += this.gameSpeed * 0.025;
+    this.cielo.tilePositionX += this.gameSpeed * 0.005;
+    this.nubes.tilePositionX += this.gameSpeed * 0.01;
+    this.arboles1.tilePositionX += this.gameSpeed * 0.015;
+    this.arboles2.tilePositionX += this.gameSpeed * 0.02;
 
-    this.Ground.tilePositionX += this.gameSpeed * 0.02;
-    this.Ground2.tilePositionX += this.gameSpeed * 0.02;
+    //this.Ground.tilePositionX += this.gameSpeed * 0.02;
+    //this.Ground1.tilePositionX += this.gameSpeed * 0.02;
+    //this.Ground2.tilePositionX += this.gameSpeed * 0.02;
     // Movimiento con WASD
     if (this.keyA.isDown) {
       this.tung.setVelocityX(-200);
@@ -232,7 +243,7 @@ export default class HelloWorldScene extends Phaser.Scene {
         this.aereoObstacle.setVelocityX(-this.gameSpeed);
         this.aereoObstacle.x = 800 + Phaser.Math.Between(0, 300);
         this.nextIsAereo = false;
-        this.obstacle.X = 2000;
+        this.obstacle.x = 2000; // <-- Corregido (era .X)
       }
     }
 
