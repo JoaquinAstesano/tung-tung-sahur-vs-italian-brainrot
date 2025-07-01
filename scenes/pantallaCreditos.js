@@ -4,7 +4,6 @@ export default class PantallaCreditos extends Phaser.Scene {
   }
 
   preload() {
-    // No cargar música aquí
   }
 
   create() {

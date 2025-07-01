@@ -4,7 +4,6 @@ export default class PantallaOpciones extends Phaser.Scene {
   }
 
   preload() {
-    // No cargar música aquí
   }
 
   create() {
@@ -20,7 +19,6 @@ export default class PantallaOpciones extends Phaser.Scene {
     this.musicBar.on('pointerdown', (pointer) => {
       let percent = Phaser.Math.Clamp((pointer.x - (400 - 100)) / 200, 0, 1);
       this.musicFill.width = percent * 200;
-      // Aquí puedes ajustar el volumen de la música global
       if (this.sound && this.sound.volume !== undefined) this.sound.volume = percent;
     });
 
@@ -32,7 +30,6 @@ export default class PantallaOpciones extends Phaser.Scene {
     this.sfxBar.on('pointerdown', (pointer) => {
       let percent = Phaser.Math.Clamp((pointer.x - (400 - 100)) / 200, 0, 1);
       this.sfxFill.width = percent * 200;
-      // Aquí puedes ajustar el volumen de los efectos especiales globales
       this.registry.set('sfxVolume', percent);
     });
 
