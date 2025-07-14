@@ -16,7 +16,7 @@ export default class Game extends Phaser.Scene {
   init() {}
   preload() {
 
-    console.log('Cargando cielo:', 'Public/assets/cielo.png');
+    
     this.load.image("tung", "Public/assets/9eiAAB.png"); 
     this.load.image("bomb", "Public/assets/bomb.png");
     this.load.image("bombini", "Public/assets/bombini.png");
@@ -24,12 +24,11 @@ export default class Game extends Phaser.Scene {
     this.load.image("Ground", "Public/assets/Ground.png");
     this.load.image("Ground1", "Public/assets/Ground1.png"); 
     this.load.image("Ground2", "Public/assets/Ground2.png");
-    this.load.image("cielo", "Public/assets/cielo.png");
-    this.load.image("nubes" , "Public/assets/nubes.png");
+    this.load.image("sprite-cielo", "Public/assets/Sprite-cielo.png");
     this.load.image("arboles1", "Public/assets/arboles1.png");
     this.load.image("arboles2", "Public/assets/arboles2.png");
     this.load.image("brrbrrpatapim2", "Public/assets/brrbrrpatapim2.png");
-    this.load.audio('musicGame', 'Public/assets/musicgame.ogg');
+    this.load.audio('musicGame', 'Public/assets/BRR BRR PATAPIM FUNK.mp3'); 
   }
 
   create() {
@@ -43,8 +42,7 @@ export default class Game extends Phaser.Scene {
       if (!this.musicGame.isPlaying) this.musicGame.play();
       this.musicGame.setVolume(0.1);
     }
-    this.cielo = this.add.tileSprite(400, 150, 800, 300, "cielo").setScrollFactor(0);
-    this.nubes = this.add.tileSprite(400, 150, 800, 300, "nubes").setScrollFactor(0);
+    this.cielo = this.add.tileSprite(400, 150, 800, 300, "sprite-cielo").setScrollFactor(0).setDepth(-10);
     this.arboles1 = this.add.tileSprite(400, 150, 800, 300, "arboles1").setScrollFactor(0);
     this.arboles2 = this.add.tileSprite(400, 150, 800, 300, "arboles2").setScrollFactor(0);
     this.Ground1 = this.add.tileSprite(400, 289, 800, 22, "Ground1"); 
@@ -187,13 +185,15 @@ export default class Game extends Phaser.Scene {
     const musicGame = this.sound.get('musicGame');
     if (musicGame && musicGame.isPlaying) musicGame.stop();
 
+    this.score = 0;
+    this.scoreText.setText('Score: ' + this.score);
+
     console.log("Game Over! Volviendo al menú...");
     this.scene.start('PantallaMenu');
   }
 
   update() {
     this.cielo.tilePositionX += this.gameSpeed * 0.005;
-    this.nubes.tilePositionX += this.gameSpeed * 0.01;
     this.arboles1.tilePositionX += this.gameSpeed * 0.015;
     this.arboles2.tilePositionX += this.gameSpeed * 0.02;
     this.Ground.tilePositionX += this.gameSpeed * 0.02;
